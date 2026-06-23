@@ -1,6 +1,5 @@
 {
-  "status": "error",
-  "message": "WhatsApp login timed out or expired.",
-  "time": "2026-06-23 11:23:36 UTC",
-  "error_type": "TimeoutError"
+  "status": "running",
+  "message": "Campaign initialized. Starting up runners...",
+  "time": "2026-06-23T11:24:21.161Z"
 }
