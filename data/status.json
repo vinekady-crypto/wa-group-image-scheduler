@@ -1,5 +1,6 @@
 {
-  "status": "waiting_qr",
-  "message": "Loading browser interface...",
-  "time": "2026-06-23 16:15:33 UTC"
+  "status": "error",
+  "message": "WhatsApp login timed out or expired.",
+  "time": "2026-06-23 16:15:44 UTC",
+  "error_type": "TimeoutError"
 }
