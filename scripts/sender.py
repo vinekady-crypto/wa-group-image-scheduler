@@ -59,8 +59,8 @@ def get_chrome_driver():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1920,1080')
     options.add_argument('--user-data-dir=./User_Data')  # Saves session files in workspace
-    # Custom user agent to prevent WhatsApp Web from blocking headless Chrome
-    options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    # Updated modern 2026 Chrome user agent to prevent WhatsApp blocking
+    options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36')
     return webdriver.Chrome(options=options)
 
 def wait_for_login(driver, timeout_seconds=300):
@@ -80,7 +80,7 @@ def wait_for_login(driver, timeout_seconds=300):
         except:
             pass
 
-        # If not logged in, check for QR code element
+        # Check for standard QR code element
         try:
             qr_element = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="qrcode"] canvas, div[data-testid="qrcode"]')
             if not qr_exported:
@@ -90,7 +90,14 @@ def wait_for_login(driver, timeout_seconds=300):
                 git_push_updates([QR_PATH, STATUS_PATH], "Exported login QR code")
                 qr_exported = True
         except:
-            pass
+            # Fallback: If not logged in and standard QR element is not rendering,
+            # take a full screen capture so the user can diagnose the browser state
+            if not qr_exported and (time.time() - start_time > 15):
+                write_log("Standard QR element not found. Capturing full page state for diagnostics...")
+                driver.save_screenshot(QR_PATH)
+                update_status("waiting_qr", "Loading browser interface. If a warning page is visible, please review.")
+                git_push_updates([QR_PATH, STATUS_PATH], "Captured full page state for diagnostics")
+                qr_exported = True
 
         time.sleep(5)
     
@@ -114,7 +121,6 @@ def send_image(driver, group_name, img_path):
     time.sleep(3)
 
     # 2. Attach File
-    # WhatsApp Web has a hidden input of type="file" inside the page structure
     file_input = WebDriverWait(driver, 15).until(
         EC.presence_of_element_located((By.XPATH, '//input[@type="file" and contains(@accept, "image")] | //input[@type="file"]'))
     )
