@@ -1,6 +1,5 @@
 {
-  "status": "error",
-  "message": "WhatsApp chats failed to synchronize or search input box was not found.",
-  "time": "2026-06-23 19:56:58 UTC",
-  "error_type": "TimeoutError"
+  "status": "running",
+  "message": "Campaign initialized. Starting up runners...",
+  "time": "2026-06-23T20:05:32.116Z"
 }
