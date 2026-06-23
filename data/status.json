@@ -1,5 +1,6 @@
 {
-  "status": "waiting_qr",
-  "message": "Loading browser interface or syncing chats...",
-  "time": "2026-06-23 20:20:01 UTC"
+  "status": "error",
+  "message": "WhatsApp chats failed to synchronize or search input box was not found.",
+  "time": "2026-06-23 20:28:09 UTC",
+  "error_type": "TimeoutError"
 }
