@@ -206,6 +206,13 @@ def run_scheduler():
                 else:
                     time.sleep(remaining_secs)
 
+            # Fresh Reload Mechanism:
+            # Right before sending the image, reload the connection and verify authentication.
+            # This clears any idle freezes, disconnected warnings, or memory issues instantly.
+            write_log("Re-establishing active connection before sending scheduled image...")
+            driver.get("https://web.whatsapp.com")
+            wait_for_login(driver)
+
             # Send action execution
             update_status("running", f"Sending scheduled Image {index + 1}/{len(items)} to group '{group_name}'...")
             git_push_updates([STATUS_PATH, LOG_PATH], f"Sending Image {index + 1}")
