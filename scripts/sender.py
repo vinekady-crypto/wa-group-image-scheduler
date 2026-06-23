@@ -93,21 +93,34 @@ def wait_for_login(driver, timeout_seconds=900):
     last_qr_update = 0
 
     while time.time() - start_time < timeout_seconds:
-        # Check if logged in (Presence of chat lists, compose box, side pane, or main chat list)
+        # Check if logged in (Presence of side pane or main chat list)
         try:
-            driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@id="pane-side"] | //div[@data-testid="chat-list"]')
-            write_log("Login verified successfully. Waiting 15 seconds for UI elements to fully settle...")
-            time.sleep(15) # Safety buffer to ensure skeleton loaders are replaced by the real interactive input elements
+            driver.find_element(By.XPATH, '//div[@id="pane-side"] | //div[@data-testid="chat-list"]')
+            write_log("Session detected. Waiting for chats to finish synchronizing and search input to render...")
             
-            # Login is 100% verified. Now we can safely transition status to 'running'
-            update_status("running", "Login successful. Waiting for scheduled dispatch times...")
-            if os.path.exists(QR_PATH):
-                os.remove(QR_PATH)
-                git_push_updates([QR_PATH, STATUS_PATH], "Removed QR code after successful login")
-            else:
-                git_push_updates([STATUS_PATH], "Transitioned status to running")
-                
-            return True
+            # Since sidebar is found, we are logged in. Now wait up to 180 seconds for the search box to appear in the DOM.
+            # This handles first-time reloads and heavy cryptographic synchronizations dynamically.
+            search_box_wait_start = time.time()
+            while time.time() - search_box_wait_start < 180:
+                try:
+                    driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@contenteditable="true"]')
+                    write_log("Login verified and search input is fully ready.")
+                    
+                    # Transition status to running
+                    update_status("running", "Login successful. Waiting for scheduled dispatch times...")
+                    if os.path.exists(QR_PATH):
+                        os.remove(QR_PATH)
+                        git_push_updates([QR_PATH, STATUS_PATH], "Removed QR code after successful login")
+                    else:
+                        git_push_updates([STATUS_PATH], "Transitioned status to running")
+                        
+                    return True
+                except:
+                    time.sleep(3)
+            
+            raise TimeoutError("WhatsApp chats failed to synchronize or search input box was not found.")
+        except TimeoutError as te:
+            raise te
         except:
             pass
 
@@ -123,12 +136,10 @@ def wait_for_login(driver, timeout_seconds=900):
                 git_push_updates([QR_PATH, STATUS_PATH], "Updated login QR code")
                 last_qr_update = time.time()
         except:
-            # Fallback: if standard element isn't rendering yet, capture full page context
-            # We keep the status strictly as 'waiting_qr' so the card NEVER hides on the dashboard
+            # Fallback: if standard element isn't rendering yet (like during chat syncing), capture full page context
             if (time.time() - start_time > 15) and (time.time() - last_qr_update > 25):
                 write_log("WhatsApp Web is loading or synchronizing in the cloud. Capturing progress...")
                 try:
-                    # Try to capture main card container to keep the image centered
                     landing_container = driver.find_element(By.CSS_SELECTOR, 'div#app, body')
                     landing_container.screenshot(QR_PATH)
                 except:
@@ -146,7 +157,7 @@ def send_image(driver, group_name, img_path):
     write_log(f"Attempting to send image: {img_path} to group: {group_name}")
     
     # 1. Locate Search box using "presence" instead of "clickable" to bypass modal coordinate blocking
-    search_box = WebDriverWait(driver, 20).until(
+    search_box = WebDriverWait(driver, 25).until(
         EC.presence_of_element_located((By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@contenteditable="true"]'))
     )
     
