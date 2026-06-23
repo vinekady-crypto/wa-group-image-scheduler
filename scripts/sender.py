@@ -66,7 +66,8 @@ def get_chrome_driver():
 def wait_for_login(driver, timeout_seconds=300):
     """Waits for login. If not logged in, exports QR and waits up to 5 minutes."""
     start_time = time.time()
-    qr_exported = False
+    last_qr_update = 0
+    qr_detected = False
 
     while time.time() - start_time < timeout_seconds:
         # Check if logged in (Presence of chat lists or compose box)
@@ -80,24 +81,32 @@ def wait_for_login(driver, timeout_seconds=300):
         except:
             pass
 
-        # Check for standard QR code element
+        # Try to locate standard WhatsApp QR container
         try:
-            qr_element = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="qrcode"] canvas, div[data-testid="qrcode"]')
-            if not qr_exported:
-                write_log("WhatsApp authentication required. Exporting QR code...")
+            qr_element = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="qrcode"]')
+            
+            # Capture and push the zoomed QR element screenshot every 20 seconds to keep it fresh
+            if time.time() - last_qr_update > 20:
+                write_log("WhatsApp QR detected. Exporting zoomed element screenshot...")
                 qr_element.screenshot(QR_PATH)
                 update_status("waiting_qr", "Authentication required. Please scan the QR code on your dashboard.")
-                git_push_updates([QR_PATH, STATUS_PATH], "Exported login QR code")
-                qr_exported = True
+                git_push_updates([QR_PATH, STATUS_PATH], "Updated login QR code")
+                last_qr_update = time.time()
+                qr_detected = True
         except:
-            # Fallback: If not logged in and standard QR element is not rendering,
-            # take a full screen capture so the user can diagnose the browser state
-            if not qr_exported and (time.time() - start_time > 15):
-                write_log("Standard QR element not found. Capturing full page state for diagnostics...")
-                driver.save_screenshot(QR_PATH)
-                update_status("waiting_qr", "Loading browser interface. If a warning page is visible, please review.")
-                git_push_updates([QR_PATH, STATUS_PATH], "Captured full page state for diagnostics")
-                qr_exported = True
+            # Fallback: if standard element isn't rendering yet, capture full page context
+            if not qr_detected and (time.time() - start_time > 15) and (time.time() - last_qr_update > 30):
+                write_log("Standard QR element not found yet. Capturing page state...")
+                try:
+                    # Try to capture main card container to keep the image centered
+                    landing_container = driver.find_element(By.CSS_SELECTOR, 'div#app, body')
+                    landing_container.screenshot(QR_PATH)
+                except:
+                    driver.save_screenshot(QR_PATH)
+                
+                update_status("waiting_qr", "Loading browser interface...")
+                git_push_updates([QR_PATH, STATUS_PATH], "Captured fallback screenshot")
+                last_qr_update = time.time()
 
         time.sleep(5)
     
