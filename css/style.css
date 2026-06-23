@@ -36,11 +36,16 @@
 }
 
 /* ==========================================================================
-   BASE & THEME STYLES
+   BASE & THEME STYLES (Locked for Screen-Fit Viewport)
    ========================================================================== */
+html, body {
+    height: 100%;
+    overflow: hidden; /* Lock viewport from double scrolls */
+    background-color: var(--bg-primary);
+}
+
 body {
     font-family: var(--font-sans);
-    background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -77,15 +82,16 @@ body {
 }
 
 /* ==========================================================================
-   APP CONTAINER LAYOUT
+   APP CONTAINER LAYOUT (Fits to Screen Height)
    ========================================================================== */
 .app-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
     padding: 0 16px;
     max-width: 640px;
     margin: 0 auto;
+    overflow: hidden; /* Keep inside boundary */
 }
 
 /* Header Styling */
@@ -93,9 +99,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
+    padding: 16px 0;
     border-bottom: 1px solid var(--border-color);
-    margin-bottom: 16px;
+    flex-shrink: 0; /* Keep fixed size */
 }
 
 .header-logo {
@@ -151,12 +157,89 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Main workspace */
-.workspace-grid {
+/* ==========================================================================
+   DYNAMIC REAL-TIME MOBILE DEBUG DIAGNOSTIC BAR
+   ========================================================================== */
+.debug-bar {
+    background-color: #1a0003;
+    border: 1.5px solid #5a0c14;
+    border-radius: var(--border-radius-md);
+    padding: 12px 16px;
+    margin-top: 10px;
+    flex-shrink: 0;
+    max-height: 160px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
+    z-index: 1100;
+}
+
+.debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #5a0c14;
+    padding-bottom: 6px;
+}
+
+.debug-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ff4d5a;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.debug-title ion-icon {
+    font-size: 16px;
+}
+
+.debug-clear-btn {
+    background-color: #3d0006;
+    border: 1px solid #7c121e;
+    color: #ffb3b8;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.debug-content {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #ffccd0;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
     flex: 1;
+}
+
+/* ==========================================================================
+   WORKSPACE MAIN VIEWPORT (Houses Tab Panels)
+   ========================================================================== */
+.workspace-viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden; /* Lock the primary box container */
+    margin: 16px 0;
+}
+
+/* Individual Scrollable Tab Panel Container */
+.tab-panel {
+    display: none; /* Inactive tabs hidden by default */
+    height: 100%;
+    overflow-y: auto; /* Scroll inside panel only */
+    padding-bottom: 80px; /* Space for fixed navigation bar */
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-panel.active {
+    display: block; /* Show active tab */
 }
 
 /* ==========================================================================
@@ -167,7 +250,6 @@ body {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     overflow: hidden;
-    transition: transform var(--transition-fast);
 }
 
 .card-header {
@@ -190,7 +272,7 @@ body {
     color: var(--text-primary);
 }
 
-/* Special card header classes */
+/* Special card headers */
 .warning-header {
     background-color: rgba(255, 210, 121, 0.05);
 }
@@ -216,7 +298,7 @@ body {
 }
 
 /* ==========================================================================
-   FORM INPUT STYLES (Touch-optimized targets >= 48px)
+   FORM INPUT STYLES (Tactile Targets >= 48px)
    ========================================================================== */
 .input-group {
     display: flex;
@@ -244,7 +326,7 @@ body {
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: 15px;
-    padding: 14px 16px; /* High tactile area */
+    padding: 14px 16px;
     outline: none;
     transition: border-color var(--transition-fast);
     width: 100%;
@@ -262,7 +344,7 @@ body {
 }
 
 /* ==========================================================================
-   BUTTON STYLES (Touch-optimized heights >= 48px)
+   BUTTON STYLES (Tactile Heights >= 48px)
    ========================================================================== */
 .btn {
     display: inline-flex;
@@ -329,9 +411,8 @@ body {
     box-shadow: 0 4px 12px rgba(0, 168, 132, 0.2);
 }
 
-/* Campaign Actions Container bottom space */
 .campaign-actions-container {
-    margin: 8px 0;
+    margin-top: 16px;
 }
 
 /* ==========================================================================
@@ -375,7 +456,6 @@ body {
     border-radius: 50%;
 }
 
-/* Badge States */
 .state-idle {
     background-color: var(--bg-input);
     color: var(--text-secondary);
@@ -403,7 +483,6 @@ body {
 }
 .state-online .badge-dot { background-color: var(--color-blue); }
 
-/* Grid stats layout */
 .dashboard-metrics {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -436,7 +515,7 @@ body {
 }
 
 /* ==========================================================================
-   IMAGE UPLOAD & LIST BUILDER (Touch Sort / Drag friendly)
+   IMAGE UPLOAD & SCHEDULE CARDS
    ========================================================================== */
 .image-schedule-list {
     display: flex;
@@ -450,7 +529,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 30px 20px;
     text-align: center;
     border: 2px dashed var(--border-color);
     border-radius: var(--border-radius-md);
@@ -468,11 +547,10 @@ body {
     color: var(--text-secondary);
 }
 
-/* List Item cards */
 .schedule-item {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-md);
@@ -493,13 +571,13 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    overflow: hidden;
 }
 
 .item-details .img-meta {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -537,6 +615,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    align-items: flex-end;
 }
 
 .btn-icon-danger {
@@ -545,34 +624,27 @@ body {
     color: var(--color-red);
     font-size: 20px;
     cursor: pointer;
-    padding: 8px;
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: background-color var(--transition-fast);
 }
 
 .btn-icon-danger:active {
     background-color: var(--color-red-dim);
 }
 
-/* Drag handles styling */
 .item-drag-handle {
     color: var(--text-muted);
     font-size: 20px;
-    cursor: grab;
     padding: 4px;
     display: flex;
     align-items: center;
 }
 
-.item-drag-handle:active {
-    cursor: grabbing;
-}
-
 /* ==========================================================================
-   WHATSAPP LOGIN PANEL & MODALS
+   WHATSAPP LOGIN QR COMPONENT
    ========================================================================== */
 .qr-instruction {
     font-size: 14px;
@@ -586,11 +658,11 @@ body {
 
 .qr-wrapper {
     position: relative;
-    width: 240px;
-    height: 240px;
+    width: 220px;
+    height: 220px;
     margin: 0 auto 20px;
     background-color: #ffffff;
-    padding: 16px;
+    padding: 12px;
     border-radius: var(--border-radius-md);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
@@ -599,7 +671,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    image-rendering: pixelated;
 }
 
 .qr-overlay {
@@ -622,10 +693,9 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Spinner anim */
 .spinner {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border: 3px solid rgba(0, 168, 132, 0.1);
     border-radius: 50%;
     border-top-color: var(--color-green);
@@ -669,7 +739,7 @@ body {
 }
 
 /* ==========================================================================
-   TIMELINE & HISTORY
+   HISTORY & NOTIFICATIONS
    ========================================================================== */
 .timeline-summary-grid {
     display: grid;
@@ -754,7 +824,7 @@ body {
 }
 
 /* ==========================================================================
-   LIVE LOG TERMINAL
+   CONSOLE TERMINAL BOX
    ========================================================================== */
 .console-terminal {
     background-color: #000000;
@@ -769,7 +839,7 @@ body {
 .console-line {
     font-size: 12px;
     line-height: 1.6;
-    color: #00ff66; /* Retro Green terminal colors */
+    color: #00ff66;
     word-break: break-all;
     margin-bottom: 4px;
 }
@@ -779,20 +849,53 @@ body {
 }
 
 /* ==========================================================================
-   FOOTER STYLES
+   MOBILE FOOTER NAVIGATION (Locked Fixed Bottom Menu)
    ========================================================================== */
-.app-footer {
-    text-align: center;
-    padding: 30px 0;
+.footer-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
-    margin-top: 24px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+    overflow-x: auto; /* Handles screen width overflows */
 }
 
-.app-footer p {
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    cursor: pointer;
+    min-width: 60px;
+    height: 100%;
+    transition: color var(--transition-fast);
+}
+
+.nav-item ion-icon {
+    font-size: 22px;
+}
+
+.nav-item .nav-label {
     font-size: 11px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Active Highlight States */
+.nav-item.active {
+    color: var(--color-green);
 }
 
 /* ==========================================================================
