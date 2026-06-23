@@ -2,28 +2,12 @@
   "group": "Love",
   "items": [
     {
-      "time": "16:30",
+      "time": "17:05",
       "image": "images/img1.jpg"
     },
     {
       "time": "17:30",
       "image": "images/img2.jpg"
-    },
-    {
-      "time": "18:30",
-      "image": "images/img3.jpg"
-    },
-    {
-      "time": "19:30",
-      "image": "images/img4.jpg"
-    },
-    {
-      "time": "20:30",
-      "image": "images/img5.jpg"
-    },
-    {
-      "time": "21:30",
-      "image": "images/img6.jpg"
     }
   ]
 }
