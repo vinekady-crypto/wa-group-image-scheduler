@@ -58,10 +58,34 @@ def get_chrome_driver():
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1920,1080')
-    options.add_argument('--user-data-dir=./User_Data')  # Saves session files in workspace
-    # Updated modern 2026 Chrome user agent to prevent WhatsApp blocking
+    
+    # Highly critical rendering options to prevent blank-page freezes in Linux containers
+    options.add_argument('--disable-gpu')
+    options.add_argument('--mute-audio')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--allow-running-insecure-content')
+    
+    options.add_argument(f'--user-data-dir={os.path.abspath("./User_Data")}')  # Absolute path resolved
+    
+    # Modern 2026 Chrome user agent
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36')
-    return webdriver.Chrome(options=options)
+    
+    # Exclude automation flags to prevent anti-bot detection
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option('useAutomationExtension', False)
+    
+    driver = webdriver.Chrome(options=options)
+    
+    # Inject Chrome DevTools Protocol script to mask navigator.webdriver property completely
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+        "source": """
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            })
+        """
+    })
+    
+    return driver
 
 def wait_for_login(driver, timeout_seconds=900):
     """Waits for login. If not logged in, exports QR and waits up to 15 minutes."""
