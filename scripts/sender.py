@@ -98,10 +98,10 @@ def wait_for_login(driver, timeout_seconds=900):
             driver.find_element(By.XPATH, '//div[@id="pane-side"] | //div[@data-testid="chat-list"]')
             write_log("Session detected. Waiting for chats to finish synchronizing and search input to render...")
             
-            # Since sidebar is found, we are logged in. Now wait up to 180 seconds for the search box to appear in the DOM.
+            # Since sidebar is found, we are logged in. Now wait up to 480 seconds (8 minutes) for the search box to appear in the DOM.
             # This handles first-time reloads and heavy cryptographic synchronizations dynamically.
             search_box_wait_start = time.time()
-            while time.time() - search_box_wait_start < 180:
+            while time.time() - search_box_wait_start < 480: # Increased wait time to 8 minutes
                 try:
                     driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@contenteditable="true"]')
                     write_log("Login verified and search input is fully ready.")
@@ -136,7 +136,7 @@ def wait_for_login(driver, timeout_seconds=900):
                 git_push_updates([QR_PATH, STATUS_PATH], "Updated login QR code")
                 last_qr_update = time.time()
         except:
-            # Fallback: if standard element isn't rendering yet (like during chat syncing), capture full page context
+            # Fallback: if standard element isn't rendering yet, capture full page context
             if (time.time() - start_time > 15) and (time.time() - last_qr_update > 25):
                 write_log("WhatsApp Web is loading or synchronizing in the cloud. Capturing progress...")
                 try:
