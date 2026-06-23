@@ -1,5 +1,5 @@
 {
-  "status": "running",
-  "message": "Initializing browser environment...",
-  "time": "2026-06-23 18:47:38 UTC"
+  "status": "waiting_qr",
+  "message": "Loading browser interface...",
+  "time": "2026-06-23 18:48:05 UTC"
 }
