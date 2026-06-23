@@ -73,10 +73,8 @@ def wait_for_login(driver, timeout_seconds=900):
         # Check if logged in (Presence of chat lists, compose box, side pane, or main chat list)
         try:
             driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@id="pane-side"] | //div[@data-testid="chat-list"]')
-            write_log("Login verified successfully.")
-            if os.path.exists(QR_PATH):
-                os.remove(QR_PATH)
-                git_push_updates([QR_PATH], "Removed QR code after successful login")
+            write_log("Login verified successfully. Waiting 15 seconds for UI elements to fully settle...")
+            time.sleep(15) # Safety buffer to ensure skeleton loaders are replaced by the real interactive input elements
             return True
         except:
             pass
@@ -214,7 +212,7 @@ def run_scheduler():
                 else:
                     time.sleep(remaining_secs)
 
-            # Fresh Reload Connection before sending
+            # Fresh Connection Reload
             write_log("Re-establishing active connection before sending scheduled image...")
             driver.get("https://web.whatsapp.com")
             wait_for_login(driver)
