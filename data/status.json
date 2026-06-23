@@ -1,5 +1,7 @@
 {
-  "status": "waiting_qr",
-  "message": "Loading browser interface...",
-  "time": "2026-06-23 18:00:44 UTC"
+  "status": "running",
+  "message": "Waiting to send Image 1/2 at 18:20 UTC.",
+  "time": "2026-06-23 18:01:15 UTC",
+  "next_image": "images/img1.jpg",
+  "next_time": "18:20"
 }
