@@ -5,3 +5,25 @@
 [2026-06-23 18:01:15 UTC] Image 1 scheduled for: 2026-06-23 18:20 UTC
 [2026-06-23 18:20:00 UTC] Re-establishing active connection before sending scheduled image...
 [2026-06-23 18:20:06 UTC] Login verified successfully.
+[2026-06-23 18:20:06 UTC] Attempting to send image: images/img1.jpg to group: Love
+[2026-06-23 18:20:27 UTC] Exception encountered: TimeoutException - Message: 
+Stacktrace:
+#0 0x556d4291229a <unknown>
+#1 0x556d422f4449 <unknown>
+#2 0x556d42348baf <unknown>
+#3 0x556d42348e01 <unknown>
+#4 0x556d42393ae4 <unknown>
+#5 0x556d42390cbf <unknown>
+#6 0x556d4233c132 <unknown>
+#7 0x556d4233cf41 <unknown>
+#8 0x556d428d8737 <unknown>
+#9 0x556d428d6f39 <unknown>
+#10 0x556d428c1c26 <unknown>
+#11 0x556d428d7ada <unknown>
+#12 0x556d428a9bd0 <unknown>
+#13 0x556d428fec28 <unknown>
+#14 0x556d428fedc5 <unknown>
+#15 0x556d42910e1e <unknown>
+#16 0x7f6fd3e9caa4 <unknown>
+#17 0x7f6fd3f29c6c <unknown>
+
