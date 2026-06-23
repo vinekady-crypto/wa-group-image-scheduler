@@ -11,11 +11,12 @@
     <!-- Ionicons for modern mobile-first iconography -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <!-- CSS Link (Styles will be generated in File 4) -->
+    <!-- CSS Link -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark-theme">
     <div class="app-container">
+        
         <!-- Header -->
         <header class="app-header">
             <div class="header-logo">
@@ -28,208 +29,240 @@
             </div>
         </header>
 
-        <!-- Main Workspace -->
-        <main class="workspace-grid">
+        <!-- Dynamic Mobile Error Diagnostic Bar (Shows silent JavaScript/API failures on screen) -->
+        <div id="global-debug-bar" class="debug-bar hidden">
+            <div class="debug-header">
+                <div class="debug-title">
+                    <ion-icon name="bug-outline"></ion-icon>
+                    <span>System Log & Diagnostics</span>
+                </div>
+                <button id="clear-debug-btn" class="debug-clear-btn">Clear</button>
+            </div>
+            <div id="debug-log-output" class="debug-content"></div>
+        </div>
+
+        <!-- Main Workspace (Panels are switched dynamically via footer navigation) -->
+        <main class="workspace-viewport">
             
-            <!-- SECTION 1: Credentials Setup -->
-            <section class="card settings-card">
-                <div class="card-header">
-                    <ion-icon name="key-outline"></ion-icon>
-                    <h2>Setup & Credentials</h2>
-                </div>
-                <div class="card-body">
-                    <p class="section-desc">Enter your generated token and repository details to link your scheduler safely.</p>
-                    <div class="input-group">
-                        <label for="gh-token">GitHub Personal Access Token</label>
-                        <input type="password" id="gh-token" placeholder="github_pat_...">
+            <!-- TAB 1: SETUP PANEL -->
+            <div id="panel-setup" class="tab-panel active">
+                <section class="card settings-card">
+                    <div class="card-header">
+                        <ion-icon name="key-outline"></ion-icon>
+                        <h2>Setup & Credentials</h2>
                     </div>
-                    <div class="grid-2-col">
+                    <div class="card-body">
+                        <p class="section-desc">Enter your generated token and repository details to link your scheduler safely.</p>
                         <div class="input-group">
-                            <label for="gh-owner">GitHub Username</label>
-                            <input type="text" id="gh-owner" placeholder="vinekady-crypto">
+                            <label for="gh-token">GitHub Personal Access Token</label>
+                            <input type="password" id="gh-token" placeholder="github_pat_...">
                         </div>
-                        <div class="input-group">
-                            <label for="gh-repo">Repository Name</label>
-                            <input type="text" id="gh-repo" value="wa-group-image-scheduler">
-                        </div>
-                    </div>
-                    <button class="btn btn-secondary" id="save-settings-btn">
-                        <ion-icon name="save-outline"></ion-icon>
-                        Save Configuration
-                    </button>
-                </div>
-            </section>
-
-            <!-- SECTION 2: Live Status Dashboard -->
-            <section class="card status-card">
-                <div class="card-header">
-                    <ion-icon name="stats-chart-outline"></ion-icon>
-                    <h2>Live Dashboard</h2>
-                </div>
-                <div class="card-body">
-                    <div class="status-indicator-grid">
-                        <div class="status-indicator-item">
-                            <span class="label">Workflow State</span>
-                            <div class="status-badge state-idle" id="workflow-state-badge">
-                                <span class="badge-dot"></span>
-                                <span class="badge-text">IDLE</span>
+                        <div class="grid-2-col">
+                            <div class="input-group">
+                                <label for="gh-owner">GitHub Username</label>
+                                <input type="text" id="gh-owner" placeholder="e.g. vinekady-crypto">
+                            </div>
+                            <div class="input-group">
+                                <label for="gh-repo">Repository Name</label>
+                                <input type="text" id="gh-repo" placeholder="wa-group-image-scheduler">
                             </div>
                         </div>
-                        <div class="status-indicator-item">
-                            <span class="label">WhatsApp Session</span>
-                            <div class="status-badge state-offline" id="wa-session-badge">
-                                <span class="badge-dot"></span>
-                                <span class="badge-text">DISCONNECTED</span>
+                        <button class="btn btn-secondary" id="save-settings-btn">
+                            <ion-icon name="save-outline"></ion-icon>
+                            Save Configuration
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 2: LIVE DASHBOARD PANEL -->
+            <div id="panel-dashboard" class="tab-panel">
+                <section class="card status-card">
+                    <div class="card-header">
+                        <ion-icon name="stats-chart-outline"></ion-icon>
+                        <h2>Live Dashboard</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="status-indicator-grid">
+                            <div class="status-indicator-item">
+                                <span class="label">Workflow State</span>
+                                <div class="status-badge state-idle" id="workflow-state-badge">
+                                    <span class="badge-dot"></span>
+                                    <span class="badge-text">IDLE</span>
+                                </div>
+                            </div>
+                            <div class="status-indicator-item">
+                                <span class="label">WhatsApp Session</span>
+                                <div class="status-badge state-offline" id="wa-session-badge">
+                                    <span class="badge-dot"></span>
+                                    <span class="badge-text">DISCONNECTED</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-metrics">
+                            <div class="metric-box">
+                                <span class="metric-label">Last Sent Image</span>
+                                <span class="metric-value" id="last-sent-img-name">-</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Last Sent Time</span>
+                                <span class="metric-value" id="last-sent-img-time">-</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Next Image</span>
+                                <span class="metric-value" id="next-scheduled-img-name">-</span>
+                            </div>
+                            <div class="metric-box">
+                                <span class="metric-label">Next Scheduled</span>
+                                <span class="metric-value" id="next-scheduled-img-time">-</span>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <div class="dashboard-metrics">
-                        <div class="metric-box">
-                            <span class="metric-label">Last Sent Image</span>
-                            <span class="metric-value" id="last-sent-img-name">-</span>
+                <!-- WhatsApp Login Required Panel (Shows when QR capture is detected in status.json) -->
+                <section class="card qr-card hidden" id="qr-container-card">
+                    <div class="card-header warning-header">
+                        <ion-icon name="qr-code-outline"></ion-icon>
+                        <h2>WhatsApp Login Required</h2>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="qr-instruction">Scan this QR code with your WhatsApp app inside <b>Linked Devices</b> to pair.</p>
+                        <div class="qr-wrapper">
+                            <img id="whatsapp-qr-image" src="" alt="WhatsApp QR Code">
+                            <div class="qr-overlay hidden" id="qr-loading-overlay">
+                                <span class="spinner"></span>
+                            </div>
                         </div>
-                        <div class="metric-box">
-                            <span class="metric-label">Last Sent Time</span>
-                            <span class="metric-value" id="last-sent-img-time">-</span>
-                        </div>
-                        <div class="metric-box">
-                            <span class="metric-label">Next Image</span>
-                            <span class="metric-value" id="next-scheduled-img-name">-</span>
-                        </div>
-                        <div class="metric-box">
-                            <span class="metric-label">Next Scheduled</span>
-                            <span class="metric-value" id="next-scheduled-img-time">-</span>
+                        <p class="qr-refresh-text">Checks for updates automatically.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 3: SCHEDULING PANEL -->
+            <div id="panel-schedule" class="tab-panel">
+                <section class="card group-card">
+                    <div class="card-header">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <h2>Target WhatsApp Group</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label for="wa-group-name">Target Group Name (Exactly as in WhatsApp)</label>
+                            <input type="text" id="wa-group-name" placeholder="e.g. Employer Updates">
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- SECTION 3: QR Code Verification Panel (Hidden by default, shown if login needed) -->
-            <section class="card qr-card hidden" id="qr-container-card">
-                <div class="card-header warning-header">
-                    <ion-icon name="qr-code-outline"></ion-icon>
-                    <h2>WhatsApp Login Required</h2>
-                </div>
-                <div class="card-body text-center">
-                    <p class="qr-instruction">Scan this QR code with your WhatsApp app inside <b>Linked Devices</b> to pair.</p>
-                    <div class="qr-wrapper">
-                        <img id="whatsapp-qr-image" src="" alt="WhatsApp QR Code">
-                        <div class="qr-overlay hidden" id="qr-loading-overlay">
-                            <span class="spinner"></span>
+                <section class="card upload-card" style="margin-top: 16px;">
+                    <div class="card-header">
+                        <ion-icon name="images-outline"></ion-icon>
+                        <h2>Upload & Schedule (Max 6)</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="section-desc">Add up to 6 images (PNG, JPG, JPEG, WEBP) and assign target future times.</p>
+                        
+                        <input type="file" id="image-file-selector" accept="image/png, image/jpeg, image/jpg, image/webp" multiple class="hidden">
+                        
+                        <button class="btn btn-outline" id="add-images-trigger">
+                            <ion-icon name="cloud-upload-outline"></ion-icon>
+                            Add Images
+                        </button>
+
+                        <div class="image-schedule-list" id="ordered-schedule-container">
+                            <div class="empty-list-state" id="empty-list-placeholder">
+                                <ion-icon name="images-outline" class="placeholder-icon"></ion-icon>
+                                <p>No images selected. Tap "Add Images" above.</p>
+                            </div>
                         </div>
                     </div>
-                    <p class="qr-refresh-text">Checks for updates automatically.</p>
-                </div>
-            </section>
+                </section>
 
-            <!-- SECTION 4: WhatsApp Group Targets -->
-            <section class="card group-card">
-                <div class="card-header">
-                    <ion-icon name="people-outline"></ion-icon>
-                    <h2>Target WhatsApp Group</h2>
-                </div>
-                <div class="card-body">
-                    <div class="input-group">
-                        <label for="wa-group-name">Target Group Name (Exactly as in WhatsApp)</label>
-                        <input type="text" id="wa-group-name" placeholder="e.g. Employer Updates">
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION 5: Image Uploads & Scheduling Workspace -->
-            <section class="card upload-card">
-                <div class="card-header">
-                    <ion-icon name="images-outline"></ion-icon>
-                    <h2>Upload & Schedule (Max 6)</h2>
-                </div>
-                <div class="card-body">
-                    <p class="section-desc">Add up to 6 images (PNG, JPG, JPEG, WEBP) and assign different future scheduled hours.</p>
-                    
-                    <!-- Hidden input to handle image additions -->
-                    <input type="file" id="image-file-selector" accept="image/png, image/jpeg, image/jpg, image/webp" multiple class="hidden">
-                    
-                    <button class="btn btn-outline" id="add-images-trigger">
-                        <ion-icon name="cloud-upload-outline"></ion-icon>
-                        Add Images
+                <section class="campaign-actions-container">
+                    <button class="btn btn-primary btn-large" id="start-campaign-trigger-btn" disabled>
+                        <ion-icon name="play-outline"></ion-icon>
+                        Launch Campaign
                     </button>
+                </section>
+            </div>
 
-                    <!-- Image Drag & Drop / Ordered Area -->
-                    <div class="image-schedule-list" id="ordered-schedule-container">
-                        <!-- Items generated dynamically by app.js -->
-                        <div class="empty-list-state" id="empty-list-placeholder">
-                            <ion-icon name="images-outline" class="placeholder-icon"></ion-icon>
-                            <p>No images selected yet. Tap "Add Images" above.</p>
+            <!-- TAB 4: TERMINAL LOGS & HISTORY PANEL -->
+            <div id="panel-logs" class="tab-panel">
+                <!-- Runtime Errors (Displays only if active error is written in status.json) -->
+                <section class="card error-card hidden" id="error-container-card" style="margin-bottom: 16px;">
+                    <div class="card-header error-header">
+                        <ion-icon name="alert-circle-outline"></ion-icon>
+                        <h2>Execution Error Found</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="error-wrapper">
+                            <span class="error-type" id="error-class-label">NoSuchElementException</span>
+                            <p class="error-msg" id="error-body-text">WhatsApp send button not found.</p>
+                            <span class="error-timestamp" id="error-time-stamp">Time: -</span>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- SECTION 6: Campaign Actions -->
-            <section class="campaign-actions-container">
-                <button class="btn btn-primary btn-large" id="start-campaign-trigger-btn" disabled>
-                    <ion-icon name="play-outline"></ion-icon>
-                    Launch Campaign
-                </button>
-            </section>
-
-            <!-- SECTION 7: Runtime Errors Panel (Hidden when empty) -->
-            <section class="card error-card hidden" id="error-container-card">
-                <div class="card-header error-header">
-                    <ion-icon name="alert-circle-outline"></ion-icon>
-                    <h2>Execution Error Found</h2>
-                </div>
-                <div class="card-body">
-                    <div class="error-wrapper">
-                        <span class="error-type" id="error-class-label">NoSuchElementException</span>
-                        <p class="error-msg" id="error-body-text">WhatsApp send button not found.</p>
-                        <span class="error-timestamp" id="error-time-stamp">Time: -</span>
+                <!-- Console logs terminal -->
+                <section class="card console-card">
+                    <div class="card-header">
+                        <ion-icon name="terminal-outline"></ion-icon>
+                        <h2>Live Console run.log</h2>
                     </div>
-                </div>
-            </section>
-
-            <!-- SECTION 8: Campaign Notifications & Run Timeline -->
-            <section class="card history-card">
-                <div class="card-header">
-                    <ion-icon name="notifications-outline"></ion-icon>
-                    <h2>History & Tracking</h2>
-                </div>
-                <div class="card-body">
-                    <div class="timeline-summary-grid">
-                        <div class="summary-stat stat-success">
-                            <span class="count" id="stat-count-completed">0</span>
-                            <span class="label">Completed</span>
-                        </div>
-                        <div class="summary-stat stat-pending">
-                            <span class="count" id="stat-count-pending">0</span>
-                            <span class="label">Pending</span>
+                    <div class="card-body">
+                        <div class="console-terminal" id="terminal-log-output">
+                            <div class="console-line text-muted">System idle. Terminal logs will appear here.</div>
                         </div>
                     </div>
-                    <ul class="notification-list" id="tracking-notification-history">
-                        <!-- Dynamic History Logs will be injected here -->
-                    </ul>
-                </div>
-            </section>
+                </section>
 
-            <!-- SECTION 9: Runner Logs Terminal -->
-            <section class="card console-card">
-                <div class="card-header">
-                    <ion-icon name="terminal-outline"></ion-icon>
-                    <h2>Live Console run.log</h2>
-                </div>
-                <div class="card-body">
-                    <div class="console-terminal" id="terminal-log-output">
-                        <div class="console-line text-muted">System idle. Terminal logs will appear here.</div>
+                <!-- History lists -->
+                <section class="card history-card" style="margin-top: 16px;">
+                    <div class="card-header">
+                        <ion-icon name="notifications-outline"></ion-icon>
+                        <h2>History & Tracking</h2>
                     </div>
-                </div>
-            </section>
+                    <div class="card-body">
+                        <div class="timeline-summary-grid">
+                            <div class="summary-stat stat-success">
+                                <span class="count" id="stat-count-completed">0</span>
+                                <span class="label">Completed</span>
+                            </div>
+                            <div class="summary-stat stat-pending">
+                                <span class="count" id="stat-count-pending">0</span>
+                                <span class="label">Pending</span>
+                            </div>
+                        </div>
+                        <ul class="notification-list" id="tracking-notification-history">
+                            <!-- Injected dynamically -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
 
         </main>
 
-        <!-- Footer -->
-        <footer class="app-footer">
-            <p>Runs independently on GitHub Actions runner.</p>
-        </footer>
+        <!-- Footer Navigation Menu (Fixed Bottom Navigation Bar) -->
+        <nav class="footer-navigation">
+            <button class="nav-item active" data-target="panel-setup">
+                <ion-icon name="settings-outline"></ion-icon>
+                <span class="nav-label">Setup</span>
+            </button>
+            <button class="nav-item" data-target="panel-dashboard">
+                <ion-icon name="stats-chart-outline"></ion-icon>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button class="nav-item" data-target="panel-schedule">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span class="nav-label">Schedule</span>
+            </button>
+            <button class="nav-item" data-target="panel-logs">
+                <ion-icon name="terminal-outline"></ion-icon>
+                <span class="nav-label">Logs</span>
+            </button>
+        </nav>
+
     </div>
 </body>
 </html>
