@@ -70,9 +70,9 @@ def wait_for_login(driver, timeout_seconds=900):
     qr_detected = False
 
     while time.time() - start_time < timeout_seconds:
-        # Check if logged in (Presence of chat lists or compose box)
+        # Check if logged in (Presence of chat lists, compose box, side pane, or main chat list)
         try:
-            driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"]')
+            driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@id="pane-side"] | //div[@data-testid="chat-list"]')
             write_log("Login verified successfully.")
             if os.path.exists(QR_PATH):
                 os.remove(QR_PATH)
