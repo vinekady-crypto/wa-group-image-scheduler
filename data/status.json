@@ -1,5 +1,5 @@
 {
-  "status": "waiting_qr",
-  "message": "Loading browser interface...",
-  "time": "2026-06-23 15:59:34 UTC"
+  "status": "running",
+  "message": "Campaign initialized. Starting up runners...",
+  "time": "2026-06-23T15:59:12.836Z"
 }
