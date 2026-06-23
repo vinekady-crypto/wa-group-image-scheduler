@@ -1,5 +1,6 @@
 {
-  "status": "running",
-  "message": "Sending scheduled Image 1/2 to group 'Love'...",
-  "time": "2026-06-23 17:05:00 UTC"
+  "status": "error",
+  "message": "Message: \nStacktrace:\n#0 0x5612b7cf929a <unknown>\n#1 0x5612b76db449 <unknown>\n#2 0x5612b772fbaf <unknown>\n#3 0x5612b772fe01 <unknown>\n#4 0x5612b777aae4 <unknown>\n#5 0x5612b7777cbf <unknown>\n#6 0x5612b7723132 <unknown>\n#7 0x5612b7723f41 <unknown>\n#8 0x5612b7cbf737 <unknown>\n#9 0x5612b7cbdf39 <unknown>\n#10 0x5612b7ca8c26 <unknown>\n#11 0x5612b7cbeada <unknown>\n#12 0x5612b7c90bd0 <unknown>\n#13 0x5612b7ce5c28 <unknown>\n#14 0x5612b7ce5dc5 <unknown>\n#15 0x5612b7cf7e1e <unknown>\n#16 0x7f688ea9caa4 <unknown>\n#17 0x7f688eb29c6c <unknown>\n",
+  "time": "2026-06-23 17:05:21 UTC",
+  "error_type": "TimeoutException"
 }

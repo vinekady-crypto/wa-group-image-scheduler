@@ -3,3 +3,25 @@
 [2026-06-23 16:33:24 UTC] Standard QR element not found yet. Capturing page state...
 [2026-06-23 16:33:55 UTC] Login verified successfully.
 [2026-06-23 16:33:55 UTC] Image 1 scheduled for: 2026-06-23 17:05 UTC
+[2026-06-23 17:05:00 UTC] Attempting to send image: images/img1.jpg to group: Love
+[2026-06-23 17:05:21 UTC] Exception encountered: TimeoutException - Message: 
+Stacktrace:
+#0 0x5612b7cf929a <unknown>
+#1 0x5612b76db449 <unknown>
+#2 0x5612b772fbaf <unknown>
+#3 0x5612b772fe01 <unknown>
+#4 0x5612b777aae4 <unknown>
+#5 0x5612b7777cbf <unknown>
+#6 0x5612b7723132 <unknown>
+#7 0x5612b7723f41 <unknown>
+#8 0x5612b7cbf737 <unknown>
+#9 0x5612b7cbdf39 <unknown>
+#10 0x5612b7ca8c26 <unknown>
+#11 0x5612b7cbeada <unknown>
+#12 0x5612b7c90bd0 <unknown>
+#13 0x5612b7ce5c28 <unknown>
+#14 0x5612b7ce5dc5 <unknown>
+#15 0x5612b7cf7e1e <unknown>
+#16 0x7f688ea9caa4 <unknown>
+#17 0x7f688eb29c6c <unknown>
+
