@@ -63,8 +63,8 @@ def get_chrome_driver():
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36')
     return webdriver.Chrome(options=options)
 
-def wait_for_login(driver, timeout_seconds=300):
-    """Waits for login. If not logged in, exports QR and waits up to 5 minutes."""
+def wait_for_login(driver, timeout_seconds=900):
+    """Waits for login. If not logged in, exports QR and waits up to 15 minutes."""
     start_time = time.time()
     last_qr_update = 0
     qr_detected = False
