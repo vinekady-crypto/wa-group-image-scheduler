@@ -115,12 +115,20 @@ def wait_for_login(driver, timeout_seconds=900):
 def send_image(driver, group_name, img_path):
     write_log(f"Attempting to send image: {img_path} to group: {group_name}")
     
-    # 1. Locate Search box
+    # 1. Locate Search box using "presence" instead of "clickable" to bypass modal coordinate blocking
     search_box = WebDriverWait(driver, 20).until(
-        EC.element_to_be_clickable((By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"]'))
+        EC.presence_of_element_located((By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@contenteditable="true"]'))
     )
-    search_box.click()
-    search_box.clear()
+    
+    # Click and Focus using direct browser JavaScript execution to completely bypass overlay blocking
+    driver.execute_script("arguments[0].focus();", search_box)
+    driver.execute_script("arguments[0].click();", search_box)
+    time.sleep(2)
+    
+    # Clear using JS backspace simulation for safety
+    search_box.send_keys(Keys.CONTROL + "a")
+    search_box.send_keys(Keys.DELETE)
+    time.sleep(1)
     
     # Type group name and hit enter
     for char in group_name:
@@ -206,9 +214,7 @@ def run_scheduler():
                 else:
                     time.sleep(remaining_secs)
 
-            # Fresh Reload Mechanism:
-            # Right before sending the image, reload the connection and verify authentication.
-            # This clears any idle freezes, disconnected warnings, or memory issues instantly.
+            # Fresh Reload Connection before sending
             write_log("Re-establishing active connection before sending scheduled image...")
             driver.get("https://web.whatsapp.com")
             wait_for_login(driver)
