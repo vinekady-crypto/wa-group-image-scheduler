@@ -9,7 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options 
+from selenium.webdriver.chrome.options import Options
 
 # Ensure tracking folders exist
 os.makedirs('data', exist_ok=True)
@@ -91,7 +91,6 @@ def wait_for_login(driver, timeout_seconds=900):
     """Waits for login. If not logged in, exports QR and waits up to 15 minutes."""
     start_time = time.time()
     last_qr_update = 0
-    qr_detected = False
 
     while time.time() - start_time < timeout_seconds:
         # Check if logged in (Presence of chat lists, compose box, side pane, or main chat list)
@@ -99,6 +98,15 @@ def wait_for_login(driver, timeout_seconds=900):
             driver.find_element(By.XPATH, '//div[@title="Search input textbox"] | //div[@contenteditable="true"][@data-tab="3"] | //div[@id="pane-side"] | //div[@data-testid="chat-list"]')
             write_log("Login verified successfully. Waiting 15 seconds for UI elements to fully settle...")
             time.sleep(15) # Safety buffer to ensure skeleton loaders are replaced by the real interactive input elements
+            
+            # Login is 100% verified. Now we can safely transition status to 'running'
+            update_status("running", "Login successful. Waiting for scheduled dispatch times...")
+            if os.path.exists(QR_PATH):
+                os.remove(QR_PATH)
+                git_push_updates([QR_PATH, STATUS_PATH], "Removed QR code after successful login")
+            else:
+                git_push_updates([STATUS_PATH], "Transitioned status to running")
+                
             return True
         except:
             pass
@@ -114,11 +122,11 @@ def wait_for_login(driver, timeout_seconds=900):
                 update_status("waiting_qr", "Authentication required. Please scan the QR code on your dashboard.")
                 git_push_updates([QR_PATH, STATUS_PATH], "Updated login QR code")
                 last_qr_update = time.time()
-                qr_detected = True
         except:
-            # Fallback: if standard element isn't rendering yet (like during chat syncing), capture full page context
+            # Fallback: if standard element isn't rendering yet, capture full page context
+            # We keep the status strictly as 'waiting_qr' so the card NEVER hides on the dashboard
             if (time.time() - start_time > 15) and (time.time() - last_qr_update > 25):
-                write_log("QR element missing. WhatsApp is currently in transit loading/syncing phase. Exporting progress...")
+                write_log("WhatsApp Web is loading or synchronizing in the cloud. Capturing progress...")
                 try:
                     # Try to capture main card container to keep the image centered
                     landing_container = driver.find_element(By.CSS_SELECTOR, 'div#app, body')
@@ -126,9 +134,8 @@ def wait_for_login(driver, timeout_seconds=900):
                 except:
                     driver.save_screenshot(QR_PATH)
                 
-                # Switch dashboard state to active running/syncing instead of keeping it stuck in 'waiting_qr'
-                update_status("running", "Syncing chats from your phone... Please keep WhatsApp active.")
-                git_push_updates([QR_PATH, STATUS_PATH], "Updated syncing progress screenshot")
+                update_status("waiting_qr", "Loading browser interface or syncing chats...")
+                git_push_updates([QR_PATH, STATUS_PATH], "Captured progress screenshot")
                 last_qr_update = time.time()
 
         time.sleep(5)
