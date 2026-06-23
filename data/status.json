@@ -1,6 +1,5 @@
 {
-  "status": "error",
-  "message": "Message: \nStacktrace:\n#0 0x55895001329a <unknown>\n#1 0x55894f9f5449 <unknown>\n#2 0x55894fa49baf <unknown>\n#3 0x55894fa49e01 <unknown>\n#4 0x55894fa94ae4 <unknown>\n#5 0x55894fa91cbf <unknown>\n#6 0x55894fa3d132 <unknown>\n#7 0x55894fa3df41 <unknown>\n#8 0x55894ffd9737 <unknown>\n#9 0x55894ffd7f39 <unknown>\n#10 0x55894ffc2c26 <unknown>\n#11 0x55894ffd8ada <unknown>\n#12 0x55894ffaabd0 <unknown>\n#13 0x55894ffffc28 <unknown>\n#14 0x55894ffffdc5 <unknown>\n#15 0x558950011e1e <unknown>\n#16 0x7f3eeb89caa4 <unknown>\n#17 0x7f3eeb929c6c <unknown>\n",
-  "time": "2026-06-23 18:45:41 UTC",
-  "error_type": "TimeoutException"
+  "status": "running",
+  "message": "Campaign initialized. Starting up runners...",
+  "time": "2026-06-23T18:46:25.382Z"
 }
