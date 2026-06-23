@@ -116,9 +116,9 @@ def wait_for_login(driver, timeout_seconds=900):
                 last_qr_update = time.time()
                 qr_detected = True
         except:
-            # Fallback: if standard element isn't rendering yet, capture full page context
-            if not qr_detected and (time.time() - start_time > 15) and (time.time() - last_qr_update > 30):
-                write_log("Standard QR element not found yet. Capturing page state...")
+            # Fallback: if standard element isn't rendering yet (like during chat syncing), capture full page context
+            if (time.time() - start_time > 15) and (time.time() - last_qr_update > 25):
+                write_log("QR element missing. WhatsApp is currently in transit loading/syncing phase. Exporting progress...")
                 try:
                     # Try to capture main card container to keep the image centered
                     landing_container = driver.find_element(By.CSS_SELECTOR, 'div#app, body')
@@ -126,8 +126,9 @@ def wait_for_login(driver, timeout_seconds=900):
                 except:
                     driver.save_screenshot(QR_PATH)
                 
-                update_status("waiting_qr", "Loading browser interface...")
-                git_push_updates([QR_PATH, STATUS_PATH], "Captured fallback screenshot")
+                # Switch dashboard state to active running/syncing instead of keeping it stuck in 'waiting_qr'
+                update_status("running", "Syncing chats from your phone... Please keep WhatsApp active.")
+                git_push_updates([QR_PATH, STATUS_PATH], "Updated syncing progress screenshot")
                 last_qr_update = time.time()
 
         time.sleep(5)
